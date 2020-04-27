@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WebSocket</title>
+</head>
+<body>
+<div>
+    <div>
+        <span>发送消息</span>
+        <input type="text" id="msg-content">
+        <input type="button" onclick="CHAT.chat()" value="点击这里发送">
+    </div>
+    <div>
+        <span>接受消息</span>
+        <div id="receive-msg" style="background-color: darkgray">
+        </div>
+    </div>
+    <script type="application/javascript">
+        window.CHAT = {
+            socket: null,
+            init: function () {
+                if (window.WebSocket) {
+                    CHAT.socket = new WebSocket("ws://127.0.0.1:8089/ws"),
+                        CHAT.socket.onopen = function () {
+                            console.log("连接建立成功。。。。")
+                        },
+                        CHAT.socket.onmessage = function (e) {
+                            console.log("接受服务端消息。。。。" + e.data);
+                            var receiveMsg = window.document.getElementById("receive-msg");
+                            var html = receiveMsg.innerHTML;
+                            receiveMsg.innerHTML = html + "<br/>" + e.data;
+
+                        },
+                        CHAT.socket.onclose = function () {
+                            console.log("连接关闭。。。。")
+                        },
+                        CHAT.socket.onerror = function () {
+                            console.log("服务端异常。。。。")
+                        }
+
+                } else {
+                    console.log("不支持websocket")
+                }
+            },
+            chat: function () {
+                var msgContent = window.document.getElementById("msg-content");
+                CHAT.socket.send(msgContent.value)
+            }
+
+        }
+        CHAT.init();
+    </script>
+</div>
+</body>
+</html>
